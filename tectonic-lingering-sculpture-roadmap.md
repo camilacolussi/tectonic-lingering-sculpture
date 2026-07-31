@@ -1,13 +1,9 @@
 # Tectonic Lingering — Sculpture Version
 ### Project Roadmap & Build Log
 
-**Reference:** Original room-scale installation by Camila Colussi (2021) — sound-light installation connected to real-time earthquake data, where light "lingers" in expectation and sound tells stories about time and tremors.
+**Reference:** Original room-scale installation > sound-light installation connected to real-time earthquake data, where light "lingers" in expectation and sound tells stories about time and tremors.
 
 **This version:** A single sculptural object exploring the same conceptual core — anticipation, touch, memory, tremor — at object scale rather than room scale. One sculpture, richer internally (3 LED strips, touch, sound, live earthquake data) rather than 3 simpler synced sculptures.
-
-> **Scope change (logged):** Originally planned as 3 identical synced sculptures (see old Stage 4 below, now removed). Decided instead to build one sculpture with more internal complexity — 3 LED strips of 30 LEDs each, plus touch/sound/API — and to explore multi-device syncing separately in a different project. This removes networking complexity from this project entirely.
-
-**Your working method:** step by step, one stage at a time, understanding *why* at each decision point, not just copy-pasting working code.
 
 ---
 
@@ -16,7 +12,7 @@
 **Goal:** Three addressable LED strips (30 LEDs each, one sculpture, more may be added later) running a "wave pulse" pattern, paused/frozen while touching a metal plate (capacitive touch), resuming from where they paused on release.
 
 ### Decisions made
-- [x] **Microcontroller**: Adafruit ESP32-S3 Feather (chosen over the HUZZAH32 so Stage 1 code carries forward unchanged into later stages — see Stage 1 notes for full reasoning and the touch-pin gotcha)
+- [x] **Microcontroller**: Adafruit ESP32-S3 Feather
 - [x] **Lighting pattern**: Wave pulse (soft glow travels the strip, brightens then dims as it passes each LED) — chosen over comet/chase (already done before) and multi-point
 - [x] **Touch behavior**: pause/freeze the pattern on touch, resume from same position on release
 
