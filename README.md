@@ -1,12 +1,10 @@
-# Tectonic Lingering — Sculpture Version
+# Tectonic Lingering — Sculpture Version (2026)
 
-A sculptural reinterpretation of [Tectonic Lingering](https://www.camilacolussi.com/tectoniclingering)
-by Camila Colussi — a room-scale sound-light installation connected to
-real-time earthquake data. This version explores the same core ideas —
-anticipation, touch, memory, tremor — at object scale, as a single
-sculpture rather than a room-size installation.
+Tectonic Lingering is a sound-light sculpture connected to real-time earthquake data. 
 
-## Current focus
+This version of the work involves an upgrade in hardware and software from the [installation version](https://www.camilacolussi.com/tectoniclingering) 
+
+## Making focus
 
 One sculpture, built in stages:
 1. **Light + touch** — 3 addressable LED strips (30 LEDs each), a wave
@@ -15,8 +13,6 @@ One sculpture, built in stages:
    depending on how quickly you touch back after releasing
 3. **Real-time data** — live earthquake magnitude from USGS, overriding
    the normal pattern when a large earthquake is detected
-4. *(Originally planned: multi-sculpture sync — descoped. See
-   [docs/roadmap.md](docs/roadmap.md) for details.)*
 
 See [docs/roadmap.md](docs/roadmap.md) for the full plan, decisions made,
 and open questions at each stage.
@@ -25,8 +21,7 @@ and open questions at each stage.
 
 - Adafruit ESP32-S3 Feather (main board — touch, LEDs, and eventually audio)
 - Adafruit Music Maker FeatherWing (VS1053 audio codec, MP3/WAV playback via SD card)
-- 3x addressable LED strip, 30 LEDs each (WS2812B-style, to confirm)
-- Adafruit HUZZAH32 Feather (kept as a spare/testbed board)
+- 3x addressable LED strip, 30 LEDs each (WS2812B-style)
 
 ## Structure
 
@@ -38,6 +33,4 @@ stage-3-api/           Code + notes for the earthquake-data stage
 media/                 Photos/videos of the physical build
 ```
 
-## Status
 
-In progress — Stage 1 (light + touch).
