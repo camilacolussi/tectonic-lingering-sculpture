@@ -14,8 +14,7 @@ direction** compared to the original ESP32 when touched. Online examples
 are often written for the older chip — if touch
 detection logic seems inverted, this is why, not a wiring fault.
 
-**LED strip:** 30-LED addressable strip. Type/model TBD —
-confirm WS2812B or similar when wiring.
+**LED strip:** 30-LED addressable strip.
 
 ## Powering note
 
