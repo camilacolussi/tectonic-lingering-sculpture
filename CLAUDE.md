@@ -22,13 +22,16 @@ help without understanding the "why").
   files don't.
 
 ## Project context
-- Full plan, decisions made, and open questions: see `docs/roadmap.md`
-- Per-stage details and hardware notes: see `<stage-folder>/notes.md`
+- Full plan, decisions made, and open questions: see
+  `docs/tectonic-lingering-sculpture-roadmap.md`
+- Per-stage details and hardware notes: see `docs/stage-1-notes.md` (Stage
+  1 for now; later stages will get their own `docs/stage-N-notes.md`)
 - This project descoped from "3 synced sculptures" to "1 sculpture, 3 LED
-  strips" partway through — `docs/roadmap.md` has the full reasoning if
+  strips" partway through —
+  `docs/tectonic-lingering-sculpture-roadmap.md` has the full reasoning if
   that context is ever needed.
 
 ## Current stage
 Stage 1 (light + touch), in progress, on the Adafruit ESP32-S3 Feather.
-Check `stage-1-light-touch/notes.md` for exact current status before
-assuming where things stand.
+Check `docs/stage-1-notes.md` for exact current status before assuming
+where things stand.

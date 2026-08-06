@@ -14,8 +14,8 @@ One sculpture, built in stages:
 3. **Real-time data** — live earthquake magnitude from USGS, overriding
    the normal pattern when a large earthquake is detected
 
-See [docs/roadmap.md](docs/roadmap.md) for the full plan, decisions made,
-and open questions at each stage.
+See [docs/tectonic-lingering-sculpture-roadmap.md](docs/tectonic-lingering-sculpture-roadmap.md)
+for the full plan, decisions made, and open questions at each stage.
 
 ## Hardware
 
