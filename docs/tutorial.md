@@ -1,10 +1,12 @@
 # Tectonic Lingering — Sculpture Version: Build Tutorial
 
 A step-by-step walkthrough of building this project, written so someone
-with no prior context could follow along. Grows alongside the stages —
-this is not a replacement for [docs/roadmap.md](docs/roadmap.md) or the per-stage
-notes files in [docs/stage-1-notes.md](docs/stage-1-notes.md), which capture *why* decisions were made. This document
-is about *how* to actually do each step.
+with no prior context could follow along. Grows alongside the work — this
+is not a replacement for [docs/roadmap.md](docs/roadmap.md) or the
+per-system notes files
+([System 1](system-1-api-leds-notes.md), [System 2](system-2-sound-touch-notes.md)),
+which capture *why* decisions were made. This document is about *how* to
+actually do each step.
 
 ---
 
@@ -63,16 +65,15 @@ upload → run) confirmed working.
 
 ---
 
-## Stage 1: touch-sensing test (with OLED readout)
+## System 2 (touch + sound): touch-sensing test (with OLED readout)
 
-**Goal:** confirm capacitive touch sensing works before writing any LED
-code, and see the raw values live instead of only through the Serial
-Monitor.
+**Goal:** confirm capacitive touch sensing works, and see the raw values
+live instead of only through the Serial Monitor. Board: ESP32-S3 Feather.
 
 ### 1. Wire the touch plate
 Connect a single wire from pin **A4** to your metal touch plate. No
 second wire to GND is needed — capacitive touch only needs the one
-connection (see `docs/stage-1-notes.md` for why).
+connection (see `docs/system-2-sound-touch-notes.md` for why).
 
 ### 2. Wire the OLED display
 0.96" I2C OLED, SSD1306 driver, no STEMMA QT connector — wired directly
@@ -89,7 +90,7 @@ In the Arduino IDE: **Tools → Manage Libraries**, search for and install:
 (this will also pull in `Adafruit BusIO` as a dependency)
 
 ### 4. Upload the sketch
-Open `stage-1-light-touch/01_touch_test/01_touch_test.ino` and upload it
+Open `system-2-sound-touch/01_touch_test/01_touch_test.ino` and upload it
 (same Board/Port as the setup step above).
 
 ### 5. Confirm it's working
@@ -100,10 +101,12 @@ plate.
 
 ---
 
-## Stage 1: LED wave pulse test
+## System 1 (API + LEDs): LED wave pulse test
 
-**Goal:** get the wave pulse pattern running on one strip before wiring
-touch into it, so the motion itself can be tuned in isolation.
+**Goal:** get the wave pulse pattern running on one strip. Being tested
+today on the ESP32-S3 Feather as a stand-in for the ESP32 V2 (not yet
+owned) — pin numbers below apply to the stand-in, re-check once the V2 is
+in hand.
 
 ### 1. Wire the LED strip
 - Strip power (V+/GND) from a separate external 5V supply — do not power
@@ -113,21 +116,21 @@ touch into it, so the motion itself can be tuned in isolation.
 - Data line: board pin **A5** → strip data-in.
 - A ~1000µF capacitor across the strip's V+/GND at its power input, and a
   ~300–470Ω resistor in series on the data line near the board's pin
-  (see `docs/stage-1-notes.md` for why these two matter).
+  (see `docs/system-1-api-leds-notes.md` for why these two matter).
 
 ### 2. Install the NeoPixel library
 In the Arduino IDE: **Tools → Manage Libraries**, search for and install
 `Adafruit NeoPixel`.
 
 ### 3. Upload the sketch
-Open `stage-1-light-touch/02_led_test/02_led_test.ino` and upload it
-(same Board/Port as before). Update `NUM_LEDS` at the top if your strip's
-LED count differs from what's currently set.
+Open `system-1-api-leds/01_led_test/01_led_test.ino` and upload it (same
+Board/Port as before). Update `NUM_LEDS` at the top if your strip's LED
+count differs from what's currently set.
 
 ### 4. Confirm it's working
 A bright leader should travel down the strip with a soft trailing tail
 behind it, looping continuously.
 
 **Status: completed** — confirmed working on hardware after several
-rounds of tuning (see `docs/stage-1-notes.md` for what didn't work along
-the way and the final parameter values).
+rounds of tuning (see `docs/system-1-api-leds-notes.md` for what didn't
+work along the way and the final parameter values).

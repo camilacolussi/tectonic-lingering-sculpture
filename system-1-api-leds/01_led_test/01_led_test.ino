@@ -8,11 +8,15 @@
 // might catch the light slightly before LED 3. Each LED's own brightness
 // still rises and falls perfectly smoothly.
 
-// Select board: Adafruit Feather ESP32-S3 No PSRAM
+// Target board: ESP32 V2 (Adafruit HUZZAH32 Feather V2) - not yet in hand.
+// Being run/tested on the ESP32-S3 Feather as a stand-in for now; pin
+// numbers below (A5) work on both, but double-check once the V2 arrives
+// (see docs/system-1-api-leds-notes.md).
+// Select board (today, temporarily): Adafruit Feather ESP32-S3 No PSRAM
 
 #include <Adafruit_NeoPixel.h>
 
-#define NUM_LEDS 30
+#define NUM_LEDS 41
 #define DATA_PIN A5
 #define GAMMA 2.8
 

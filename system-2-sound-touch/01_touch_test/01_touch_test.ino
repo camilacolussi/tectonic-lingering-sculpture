@@ -1,6 +1,7 @@
 // Touch test: shows raw touchRead() values on the OLED so we can see the
 // actual touched vs. untouched range before choosing a threshold.
 
+// Target board: Adafruit ESP32-S3 Feather (System 2 - touch + sound)
 // Select board: Adafruit Feather ESP32-S3 No PSRAM
 
 #include <Wire.h>
@@ -16,7 +17,7 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 const int touchPin = A4; // GPIO14 / touch channel T14
-const long touchThreshold = 100000; // untouched ~32k, touched ~228k+ (see stage-1-notes.md)
+const long touchThreshold = 100000; // untouched ~32k, touched ~228k+ (see docs/system-2-sound-touch-notes.md)
 
 void setup() {
   Serial.begin(115200);
