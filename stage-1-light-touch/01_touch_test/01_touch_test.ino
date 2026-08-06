@@ -1,6 +1,8 @@
 // Touch test: shows raw touchRead() values on the OLED so we can see the
 // actual touched vs. untouched range before choosing a threshold.
 
+// Select board: Adafruit Feather ESP32-S3 No PSRAM
+
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
