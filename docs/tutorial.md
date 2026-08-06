@@ -2,8 +2,8 @@
 
 A step-by-step walkthrough of building this project, written so someone
 with no prior context could follow along. Grows alongside the stages —
-this is not a replacement for `docs/roadmap.md` or the per-stage
-`notes.md` files, which capture *why* decisions were made. This document
+this is not a replacement for [docs/roadmap.md](docs/roadmap.md) or the per-stage
+notes files in [docs/stage-1-notes.md](docs/stage-1-notes.md), which capture *why* decisions were made. This document
 is about *how* to actually do each step.
 
 ---
@@ -55,4 +55,79 @@ clicking Upload) to enter programming mode — check the board's silkscreen
 labeling if this happens, since exact button names vary slightly by
 manufacturer revision.
 
-**Status: not yet completed — this is the current next step.**
+**Status: completed.** Board support was already installed and the board
+was detected correctly (Adafruit Feather ESP32-S3 No PSRAM) as soon as it
+was selected in Tools → Board and Tools → Port. Blink uploaded
+successfully and the onboard LED blinked — full toolchain (compile →
+upload → run) confirmed working.
+
+---
+
+## Stage 1: touch-sensing test (with OLED readout)
+
+**Goal:** confirm capacitive touch sensing works before writing any LED
+code, and see the raw values live instead of only through the Serial
+Monitor.
+
+### 1. Wire the touch plate
+Connect a single wire from pin **A4** to your metal touch plate. No
+second wire to GND is needed — capacitive touch only needs the one
+connection (see `docs/stage-1-notes.md` for why).
+
+### 2. Wire the OLED display
+0.96" I2C OLED, SSD1306 driver, no STEMMA QT connector — wired directly
+to header pins:
+- VIN/VCC → 3V
+- GND → GND
+- SDA → SDA
+- SCL → SCL
+
+### 3. Install the OLED libraries
+In the Arduino IDE: **Tools → Manage Libraries**, search for and install:
+- `Adafruit SSD1306`
+- `Adafruit GFX Library`
+(this will also pull in `Adafruit BusIO` as a dependency)
+
+### 4. Upload the sketch
+Open `stage-1-light-touch/01_touch_test/01_touch_test.ino` and upload it
+(same Board/Port as the setup step above).
+
+### 5. Confirm it's working
+The OLED should show a number that changes as you touch/release the
+plate.
+
+**Status: completed** — OLED displays live touch readings correctly.
+
+---
+
+## Stage 1: LED wave pulse test
+
+**Goal:** get the wave pulse pattern running on one strip before wiring
+touch into it, so the motion itself can be tuned in isolation.
+
+### 1. Wire the LED strip
+- Strip power (V+/GND) from a separate external 5V supply — do not power
+  the strip from the board.
+- Board GND and strip power supply GND must be tied together (shared
+  ground), even though only the strip draws from the external supply.
+- Data line: board pin **A5** → strip data-in.
+- A ~1000µF capacitor across the strip's V+/GND at its power input, and a
+  ~300–470Ω resistor in series on the data line near the board's pin
+  (see `docs/stage-1-notes.md` for why these two matter).
+
+### 2. Install the NeoPixel library
+In the Arduino IDE: **Tools → Manage Libraries**, search for and install
+`Adafruit NeoPixel`.
+
+### 3. Upload the sketch
+Open `stage-1-light-touch/02_led_test/02_led_test.ino` and upload it
+(same Board/Port as before). Update `NUM_LEDS` at the top if your strip's
+LED count differs from what's currently set.
+
+### 4. Confirm it's working
+A bright leader should travel down the strip with a soft trailing tail
+behind it, looping continuously.
+
+**Status: completed** — confirmed working on hardware after several
+rounds of tuning (see `docs/stage-1-notes.md` for what didn't work along
+the way and the final parameter values).

@@ -9,20 +9,23 @@
 
 ## Stage 1 — Light + Touch
 
-**Goal:** Three addressable LED strips (30 LEDs each, one sculpture, more may be added later) running a "wave pulse" pattern, paused/frozen while touching a metal plate (capacitive touch), resuming from where they paused on release.
+**Goal:** Three addressable LED strips (42 LEDs each currently — count may
+still change, see below — one sculpture, more may be added later) running
+a "wave pulse" pattern, paused/frozen while touching a metal plate
+(capacitive touch), resuming from where they paused on release.
 
 ### Decisions made
 - [x] **Microcontroller**: Adafruit ESP32-S3 Feather
-- [x] **Lighting pattern**: Wave pulse (soft glow travels the strip, brightens then dims as it passes each LED) — chosen over comet/chase (already done before) and multi-point
+- [x] **Lighting pattern**: Wave pulse, refined on hardware into an asymmetric leader-with-trailing-tail shape (not a symmetric glow) — see `docs/stage-1-notes.md` for the tuned parameters and what didn't work along the way
 - [x] **Touch behavior**: pause/freeze the pattern on touch, resume from same position on release
+- [x] **LED strip type**: WS2812B/NeoPixel-style (individually addressable), confirmed
+- [x] **Power**: separate 5V 3A supply for the LED strip(s), confirmed and wired — board itself stays powered via USB from the computer, grounds shared between the two supplies
 
 ### Decisions still to make
-- [ ] **LED strip type**: confirm WS2812B/NeoPixel-style (individually addressable) — assumed based on "addressable"
-- [ ] **Power**: 3 strips × 30 LEDs at full white brightness draws meaningfully more current than a USB port comfortably provides — a separate 5V supply is likely needed, worth confirming before wiring
+- [ ] **Final LED count per strip**: 42 confirmed for the current test strip, but may change — changing it means updating both the code (`NUM_LEDS`) and the power draw calculation (LEDs × 60mA)
 - [ ] **Wiring 3 strips from one board**: whether each strip gets its own data pin (simplest, most reliable) or they're chained — three separate data pins is the recommended default unless there's a specific reason to chain
 
 ### Concepts to learn here
-- How addressable LED protocols work (data line, no separate control wires per LED)
 - Capacitive touch sensing — how it senses "touch" without a physical switch
 - Basic microcontroller I/O concepts (digital pins vs. touch-capable pins)
 
@@ -35,11 +38,9 @@
 **Goal:** MP3 track triggered by touch. Stops when released. If released <5 sec then touched again → resume with reverb/echo added. If released ≥5 sec → track resets to start on next touch.
 
 ### Why this is the hard stage
-Real-time audio effects (reverb, echo/delay) are computationally heavier than blinking LEDs. This is likely why it stalled last time on a bare ESP32.
+Real-time audio effects (options to be explored) are computationally heavier than blinking LEDs. This is likely why it stalled last time on a bare ESP32.
 
-> **Honest note:** This isn't a skill gap on your part — a bare ESP32 genuinely isn't the right tool for live reverb/echo. When we reach this stage, expect me to introduce a board built specifically for audio work (with an effects library already designed for exactly this kind of thing), rather than trying to force the ESP32 to do DSP it wasn't built for.
-
-**Hardware confirmed:** Adafruit ESP32-S3 Feather + Adafruit Music Maker FeatherWing (VS1053 codec, plays MP3/WAV/etc. over SPI, SD card storage). Already owned — no new purchase needed for this stage.
+**Hardware confirmed:** Adafruit ESP32-S3 Feather + Adafruit Music Maker FeatherWing (VS1053 codec, plays MP3/WAV/etc. over SPI, SD card storage). 
 
 **Recommended approach — sidestep live DSP entirely:** the VS1053 chip handles playback/volume/bass/treble but isn't built for live reverb/echo. Rather than fight the hardware, pre-render two versions of the track using Max MSP (which you already know how to do): a "dry" version and a version with reverb/echo already baked in. Store both on the SD card. The microcontroller's job becomes simple: decide *which file to play* based on touch timing, not compute any audio effect live.
 
@@ -77,12 +78,6 @@ Microcontrollers historically struggle with enterprise WiFi (WPA2-Enterprise, wh
 
 ---
 
-## Stage 4 — Removed (scope change)
-
-Originally: 3 synced sculptures with a central hub. Descoped — this project is now one sculpture. Multi-device syncing (ESP-NOW, hub-and-spoke architecture) will be explored in a separate future project instead. The Adafruit SCORPIO board (previously earmarked for this stage) is now unassigned — free to use elsewhere or set aside.
-
----
-
 ## Working method going forward
 
 - We tackle **one stage at a time**, fully, before moving to the next.
@@ -93,4 +88,6 @@ Originally: 3 synced sculptures with a central hub. Descoped — this project is
 ---
 
 ## Immediate next step
-Stage 1, in progress on the ESP32-S3 Feather: touch-sensing test first (confirm touch works before adding LED complexity), then build the wave pulse pattern across the 3 strips, with touch pausing/resuming it.
+Touch sensing and the LED wave pulse pattern are each confirmed working
+on hardware, but as two separate sketches. Next: combine them so touch
+pauses/freezes the pattern and release resumes it from the same position.
