@@ -29,11 +29,33 @@ touch-pauses-LEDs behavior entirely and let System 1 run autonomously
 off the API data alone. **Not yet decided — flag before assuming either
 way.**
 
-**Hardware not yet in hand:** the ESP32 V2 arrives 2026-08-07. Until
-then, System 1 code is being written and tested on the ESP32-S3 Feather
+**Hardware arrived (2026-08-07):** the ESP32 V2 board is in hand — it's
+the Adafruit Feather ESP32 V2 (chip identifies as ESP32-PICO-V3-02).
+Until now, System 1 code was written and tested on the ESP32-S3 Feather
 as a stand-in (it also has WiFi, so the API-fetching logic ports over
-directly; only pin numbers may need to change once the actual V2 board
-is wired up).
+directly; only pin numbers may need to change now that code moves to the
+actual V2 board).
+
+**Uploading to the Feather ESP32 V2 — no manual bootloader button:**
+unlike some other ESP32 boards, this board has no BOOT/GPIO0 button to
+manually force download mode. Its two buttons are `Reset` (reboots the
+board) and `SW38` (a general-purpose user input button on GPIO38,
+exposed in Arduino as `BUTTON`, pulled up on-board) — SW38 is *not* tied
+to bootloader entry. Uploading relies entirely on the automatic DTR/RTS
+reset circuit built around the onboard CP2104 USB-serial chip.
+
+- First upload attempt (Blink) failed partway through: esptool connected
+  and correctly identified the chip, but then failed with "Unable to
+  verify flash chip connection" during the stub-flasher step — a sign
+  the auto-reset timing into bootloader mode wasn't reliable at the
+  default upload speed.
+- **Fix that worked:** Tools → Upload Speed → 115200 (down from the
+  default 921600). Board has no power LED or power switch, so visual
+  power-good confirmation isn't available on this board either — keep
+  that in mind if a board ever appears totally unresponsive.
+- The CP2104 driver itself was *not* the issue here — esptool reaching
+  the chip-ID step at all confirms the driver was already working; no
+  separate driver install was needed on this Mac.
 
 ## LED strip
 
@@ -136,7 +158,8 @@ magnitude value.
 - [x] Build and test the wave pulse pattern on one strip (`system-1-api-leds/01_led_test/`) — confirmed working on hardware
 - [x] Confirm final LED count — 41
 - [ ] Decide whether strips 2 and 3 will use their own data pins or be chained (strip 1 uses A5 on the S3 stand-in)
-- [ ] Confirm exact ESP32 V2 board model and its pinout once in hand (2026-08-07)
+- [x] Confirm exact ESP32 V2 board model — Adafruit Feather ESP32 V2 (chip: ESP32-PICO-V3-02), in hand and uploading successfully as of 2026-08-07
+- [ ] Confirm the V2 board's pinout once wiring the LED strip to it (data pin was A5/GPIO8 on the S3 stand-in — likely needs to change)
 - [ ] Re-verify power wiring, data pin, and protective components once moved from the S3 stand-in to the actual V2 board
 - [ ] Decide whether touch-pauses-LEDs is dropped, or revisited later via a wireless link between the two boards
 - [ ] Build and test the USGS earthquake API fetch + magnitude override behavior

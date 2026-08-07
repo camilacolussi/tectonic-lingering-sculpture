@@ -12,7 +12,7 @@
 // Being run/tested on the ESP32-S3 Feather as a stand-in for now; pin
 // numbers below (A5) work on both, but double-check once the V2 arrives
 // (see docs/system-1-api-leds-notes.md).
-// Select board (today, temporarily): Adafruit Feather ESP32-S3 No PSRAM
+// Select board : Adafruit Feather ESP32-S3 No PSRAM
 
 #include <Adafruit_NeoPixel.h>
 
