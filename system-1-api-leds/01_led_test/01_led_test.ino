@@ -1,18 +1,17 @@
-// LED motion test: wave pulse - a bright leader travels the strip with a
-// soft trailing tail behind it (comet-style, not symmetric). No touch
-// logic yet, this is just for testing/tuning the motion itself.
-//
-// White light, smooth over time - no per-frame flicker. Each LED has a
-// small fixed position offset (chosen once at startup) so neighboring
-// LEDs don't peak in strict index order as the leader passes - e.g. LED 4
-// might catch the light slightly before LED 3. Each LED's own brightness
-// still rises and falls perfectly smoothly.
+/* 
+LED TAIL using a ESP32-V2
 
-// Target board: ESP32 V2 (Adafruit HUZZAH32 Feather V2) - not yet in hand.
-// Being run/tested on the ESP32-S3 Feather as a stand-in for now; pin
-// numbers below (A5) work on both, but double-check once the V2 arrives
-// (see docs/system-1-api-leds-notes.md).
-// Select board : Adafruit Feather ESP32-S3 No PSRAM
+LED wave motion: a bright leader travels the strip with a
+soft trailing tail behind it (comet-style).
+
+LED strip data pin: A5
+Total LEDs: 41
+Powering strip via: 5V 3A Power Supply 
+
+IMPORTANT:
+- Select board : Adafruit Feather ESP32 V2
+- Select Upload speed: Tools → Upload Speed → 115200
+*/
 
 #include <Adafruit_NeoPixel.h>
 
