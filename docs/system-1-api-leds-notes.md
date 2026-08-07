@@ -145,11 +145,49 @@ longer exists in the repo.
 
 ## API — earthquake data (USGS)
 
-Not yet started — this is today's next actual work. Plan (per the
-learning-first approach already agreed): explain what an API is with a
-few examples, then data formats (CSV vs JSON/GeoJSON), then how a
-microcontroller requests data (polling), then how to extract just the
-magnitude value.
+**Confirmed working (2026-08-07)**, in `system-1-api-leds/03_API_test/` —
+connects to eduroam, fetches from USGS, prints the latest matching
+earthquake's magnitude to Serial once a minute.
+
+- **Network:** the board connects over **eduroam (WPA2-Enterprise)**, not a
+  plain home WiFi network — this only became relevant once testing moved
+  off the home network the S3 stand-in was originally tested on.
+  Connection is handled by the third-party `WiFiEnterprise` library
+  (`~/Documents/Arduino/libraries/ESP32WiFiEnterprise`), tested standalone
+  first in `system-1-api-leds/02_ESP32_eduroam/` before folding into
+  `03_API_test`. That library internally includes the now-deprecated
+  `esp_wpa2.h` (current ESP32 core prefers `esp_eap_client.h`) — compiles
+  fine today with just a deprecation warning, but flagging in case a future
+  core update breaks it.
+- **Credential handling — deliberately manual, no file ever holds them:**
+  `username`/`password` in both `02_ESP32_eduroam.ino` and
+  `03_API_test.ino` are compile-time `const char*` constants, left blank
+  (`""`) at rest. Real values are hand-typed in immediately before each
+  upload, then blanked back out before saving — never committed, and never
+  read by an AI assistant working in this repo. Two approaches were tried
+  and rejected first: (1) a separate `arduino_secrets.h` file excluded via
+  `.gitignore` — safe from GitHub, but still a plaintext file sitting on
+  disk that could be opened; (2) typing credentials at runtime over Serial
+  each boot — keeps them out of any file entirely, but requires a live USB
+  connection, which conflicts with the board eventually running standalone
+  off its own power with no computer attached. Manual pre-upload editing
+  was the only option satisfying both "never on disk" and "works
+  untethered." **Real risk to stay aware of:** since these two `.ino`
+  files aren't gitignored, nothing stops a `git commit` from picking up
+  real credentials if they aren't blanked out before saving — this relies
+  entirely on remembering the edit → upload → blank → save sequence every
+  time, with no automated safety net.
+- **Efficiency choices in the USGS request** (`03_API_test.ino`):
+  `format=text` (pipe-delimited plain text, not GeoJSON — far smaller
+  payload, no JSON library needed), `limit=1&orderby=time` (server returns
+  just the single most recent match), `minmagnitude=` filter applied
+  server-side. Currently set to **4.5** (raised from an initial 2.5 while
+  testing — 2.5+ events are frequent enough to fire almost every fetch).
+  Only the `Magnitude` field (pipe-index 10) is parsed out; location was
+  dropped since it wasn't needed.
+- Upload note specific to this board: Tools → Board → **Adafruit Feather
+  ESP32 V2**, Tools → Upload Speed → **115200** (see the Blink upload fix
+  logged above — same fix applies here).
 
 ## Open items
 
@@ -162,4 +200,5 @@ magnitude value.
 - [ ] Confirm the V2 board's pinout once wiring the LED strip to it (data pin was A5/GPIO8 on the S3 stand-in — likely needs to change)
 - [ ] Re-verify power wiring, data pin, and protective components once moved from the S3 stand-in to the actual V2 board
 - [ ] Decide whether touch-pauses-LEDs is dropped, or revisited later via a wireless link between the two boards
-- [ ] Build and test the USGS earthquake API fetch + magnitude override behavior
+- [x] Build and test the USGS earthquake API fetch — confirmed working (`system-1-api-leds/03_API_test/`), prints magnitude to Serial once a minute over eduroam
+- [ ] Wire the fetched magnitude into the LED wave pulse pattern (currently the two sketches are separate — `01_led_test` for LEDs, `03_API_test` for the API — not yet combined into one program)

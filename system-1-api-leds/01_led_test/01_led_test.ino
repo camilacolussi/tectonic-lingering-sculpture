@@ -9,7 +9,7 @@ Total LEDs: 41
 Powering strip via: 5V 3A Power Supply 
 
 IMPORTANT:
-- Select board : Adafruit Feather ESP32 V2
+- Select board : Adafruit ESP32 Feather
 - Select Upload speed: Tools → Upload Speed → 115200
 */
 
