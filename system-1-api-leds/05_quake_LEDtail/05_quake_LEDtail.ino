@@ -13,9 +13,15 @@
   Connection is only attempted in setup() — no automatic reconnect if it
   drops later.
 
-IMPORTANT:
+IMPORTANT!!!!!!
 - Select board : Adafruit ESP32 Feather
 - Select Upload speed: Tools → Upload Speed → 115200
+
+COB EXPERIMENT:
+const float tailWidth = 6.0; //4.0 original
+const float leadWidth = 4.0; // 2.0 original
+const float pulseSpeed = 0.3;
+const float offsetRange = 2.0; //4.0 original
 
 */
 
