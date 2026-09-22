@@ -48,10 +48,18 @@ float pulsePos = 0;
 float posOffset[NUM_LEDS];
 
 // ---- Quake flash override ----
+// Flash duration scales with the detected quake's magnitude: MIN_MAGNITUDE
+// (4.5) holds for QUAKE_FLASH_DURATION_MIN_MS, magnitude 9.0 holds for
+// QUAKE_FLASH_DURATION_MAX_MS, and everything in between is a linear
+// interpolation between those two points (computed in quakeFlashDurationForMagnitude()).
 
-const unsigned long QUAKE_FLASH_DURATION_MS = 5000;
+const unsigned long QUAKE_FLASH_DURATION_MIN_MS = 5000;    // at MIN_MAGNITUDE (4.5)
+const unsigned long QUAKE_FLASH_DURATION_MAX_MS = 180000;  // at magnitude 9.0 (3 minutes)
+const float QUAKE_FLASH_DURATION_MAX_MAGNITUDE = 9.0;
+
 bool quakeFlashActive = false;
 unsigned long quakeFlashStartTime = 0;
+unsigned long quakeFlashDurationMs = QUAKE_FLASH_DURATION_MIN_MS; // set per-quake, see handleResponse()
 
 // ---- WiFi status LED ----
 // Blinks while not connected, steady on once connected. Connection is only
@@ -136,7 +144,7 @@ void loop() {
   }
 
   if (quakeFlashActive) {
-    if (millis() - quakeFlashStartTime >= QUAKE_FLASH_DURATION_MS) {
+    if (millis() - quakeFlashStartTime >= quakeFlashDurationMs) {
       quakeFlashActive = false; // falls through to resume the wave this same loop
     } else {
       delay(40); // same per-iteration pacing as the wave pattern, just idling
@@ -171,6 +179,18 @@ void renderWaveFrame() {
 
   pulsePos += pulseSpeed;
   if (pulsePos >= NUM_LEDS) pulsePos -= NUM_LEDS;
+}
+
+// Maps a quake's magnitude to how long the flash should hold, linearly
+// interpolating between (MIN_MAGNITUDE -> QUAKE_FLASH_DURATION_MIN_MS) and
+// (QUAKE_FLASH_DURATION_MAX_MAGNITUDE -> QUAKE_FLASH_DURATION_MAX_MS).
+// Magnitude is clamped to that range first, so anything at or below
+// MIN_MAGNITUDE gets the minimum duration and anything at or above 9.0 gets
+// the maximum — no extrapolating past either end.
+unsigned long quakeFlashDurationForMagnitude(float magnitude) {
+  float clamped = constrain(magnitude, MIN_MAGNITUDE, QUAKE_FLASH_DURATION_MAX_MAGNITUDE);
+  float t = (clamped - MIN_MAGNITUDE) / (QUAKE_FLASH_DURATION_MAX_MAGNITUDE - MIN_MAGNITUDE);
+  return QUAKE_FLASH_DURATION_MIN_MS + (unsigned long)(t * (QUAKE_FLASH_DURATION_MAX_MS - QUAKE_FLASH_DURATION_MIN_MS));
 }
 
 // ---- USGS fetch / new-quake detection (from 04_new-quake) ----
@@ -247,7 +267,11 @@ void handleResponse(const String& response) {
   }
   lastEventId = eventId;
 
-  Serial.println("New earthquake detected! Flashing strip.");
+  quakeFlashDurationMs = quakeFlashDurationForMagnitude(magnitudeStr.toFloat());
+
+  Serial.print("New earthquake detected! Flashing strip for ");
+  Serial.print(quakeFlashDurationMs / 1000.0);
+  Serial.println("s.");
 
   for (int i = 0; i < NUM_LEDS; i++) {
     strip.setPixelColor(i, strip.Color(255, 255, 255));
