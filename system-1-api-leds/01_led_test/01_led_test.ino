@@ -15,7 +15,7 @@ IMPORTANT:
 
 #include <Adafruit_NeoPixel.h>
 
-#define NUM_LEDS 41
+#define NUM_LEDS 16
 #define DATA_PIN A5
 #define GAMMA 2.8
 

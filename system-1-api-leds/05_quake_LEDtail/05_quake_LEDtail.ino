@@ -16,6 +16,7 @@
 IMPORTANT:
 - Select board : Adafruit ESP32 Feather
 - Select Upload speed: Tools → Upload Speed → 115200
+- Add WIFI credentials
 
 */
 
