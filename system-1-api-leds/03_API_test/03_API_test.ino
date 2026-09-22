@@ -21,8 +21,8 @@ IMPORTANT:
 #include <HTTPClient.h>
 
 const char* EDUROAM_SSID = "eduroam";
-const char* eduroamUsername = "ku72395@kingston.ac.uk"; // KU email
-const char* eduroamPassword = "Camiking1.!";
+const char* eduroamUsername = ""; // KU email
+const char* eduroamPassword = "";
 
 // Status LED: blinks while not connected, steady on once connected.
 // Connection is only ever attempted in setup() here — if it drops later,
