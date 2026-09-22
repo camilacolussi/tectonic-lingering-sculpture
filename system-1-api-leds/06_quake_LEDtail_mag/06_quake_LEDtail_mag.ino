@@ -55,7 +55,7 @@ float posOffset[NUM_LEDS];
 
 const unsigned long QUAKE_FLASH_DURATION_MIN_MS = 5000;    // at MIN_MAGNITUDE (4.5)
 const unsigned long QUAKE_FLASH_DURATION_MAX_MS = 180000;  // at magnitude 9.0 (3 minutes)
-const float QUAKE_FLASH_DURATION_MAX_MAGNITUDE = 9.0;
+const float QUAKE_FLASH_DURATION_MAX_MAGNITUDE = 9.5;
 
 bool quakeFlashActive = false;
 unsigned long quakeFlashStartTime = 0;
