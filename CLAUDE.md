@@ -22,8 +22,11 @@ now with more understanding of what I'm doing (previously had to ask for help).
 - Edit the documents in the docs folder if we take different decisions or what they say needs update.
 
 ## Current focus
-System 1 (API + LEDs): LED wave pulse pattern confirmed working on
-hardware. Next up is the API piece — check
+System 1 (API + LEDs): wave pattern, USGS API and magnitude-scaled quake
+flash are combined and working on one strip (`06_quake_LEDtail_mag`).
+Next up is testing `07_quake_LEDtail_mag_x3_sync` on hardware — 3 strips
+of 40 LEDs (pins A5, A0, A1) on the ESP32 V2, powered by a 5V 30A
+supply. Check
 [docs/system-1-api-leds-notes.md](docs/system-1-api-leds-notes.md)
 (especially Open items) for exact current status before assuming where
 things stand.

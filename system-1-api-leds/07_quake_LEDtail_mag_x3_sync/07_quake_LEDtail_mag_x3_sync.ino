@@ -1,10 +1,18 @@
 /*
-  05_quake_LEDtail
+  07_quake_LEDtail_mag_x3_sync
 
-  Combines 01_led_test's LED wave-tail pattern with 04_new-quake's USGS
-  earthquake detection: the wave tail runs continuously, but when a new
-  earthquake is detected, the whole strip snaps to solid white for 5
-  seconds, then resumes the wave tail pattern from where it left off.
+  Builds on 06_quake_LEDtail_mag (wave tail + USGS quake detection +
+  magnitude-scaled white flash), but drives 3 LED strips instead of 1.
+
+  New in 07: 3 strips of 40 LEDs, each on its own data pin (A5, A0, A1).
+  All 3 share one wave position, so the pulse travels along them together,
+  but each strip has its own random posOffset "shimmer", so each has its own
+  texture. A new quake flashes all 3 white at once for the magnitude-scaled
+  duration, then they all resume the wave together.
+
+  Power: 3 x 40 LEDs at full white (the flash) is roughly 4+ A at
+  brightness 150 — needs an external 5V supply rated for it, with its
+  ground tied to the board's ground.
 
   Checks USGS every minute over eduroam (WPA2-Enterprise) — see
   02_ESP32_eduroam for the connection method on its own.
@@ -33,19 +41,29 @@ const float offsetRange = 2.0; //4.0 original
 
 // ---- LED strip / wave-tail pattern (from 01_led_test) ----
 
-#define NUM_LEDS 41
-#define DATA_PIN A5
+#define NUM_STRIPS 3
+#define NUM_LEDS 40 // per strip
 #define GAMMA 2.8
 
-Adafruit_NeoPixel strip(NUM_LEDS, DATA_PIN, NEO_GRB + NEO_KHZ800);
+// One Adafruit_NeoPixel object per strip, each on its own data pin.
+// On the Feather ESP32 V2, A2/A3/A4 are input-only and can't drive a strip,
+// so strips 2 and 3 use A0 and A1.
+Adafruit_NeoPixel strip1(NUM_LEDS, A5, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip2(NUM_LEDS, A0, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip3(NUM_LEDS, A1, NEO_GRB + NEO_KHZ800);
+
+// Lets every function loop over "all strips" instead of repeating code 3 times.
+Adafruit_NeoPixel* strips[NUM_STRIPS] = { &strip1, &strip2, &strip3 };
 
 const float tailWidth = 4.0;
 const float leadWidth = 2.0;
 const float pulseSpeed = 0.3;
 const float offsetRange = 4.0;
 
+// Shared by all strips, so the pulse is in the same place on each.
 float pulsePos = 0;
-float posOffset[NUM_LEDS];
+// One row of offsets per strip, so each strip gets its own shimmer.
+float posOffset[NUM_STRIPS][NUM_LEDS];
 
 // ---- Quake flash override ----
 // Flash duration scales with the detected quake's magnitude: MIN_MAGNITUDE
@@ -102,13 +120,21 @@ void setup() {
   Serial.begin(115200);
   while (!Serial) { }
 
-  strip.begin();
-  strip.setBrightness(150);
-  strip.show();
-  randomSeed(analogRead(A0));
+  for (int s = 0; s < NUM_STRIPS; s++) {
+    strips[s]->begin();
+    strips[s]->setBrightness(150);
+    strips[s]->show();
+  }
 
-  for (int i = 0; i < NUM_LEDS; i++) {
-    posOffset[i] = random(-100, 100) / 100.0 * offsetRange;
+  // Seeded from A2 (unconnected, input-only) rather than A0, since A0 is now
+  // a strip data pin — reading an output pin would give the same "random"
+  // seed every boot.
+  randomSeed(analogRead(A2));
+
+  for (int s = 0; s < NUM_STRIPS; s++) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+      posOffset[s][i] = random(-100, 100) / 100.0 * offsetRange;
+    }
   }
 
   pinMode(WIFI_LED_PIN, OUTPUT);
@@ -157,26 +183,34 @@ void loop() {
 }
 
 void renderWaveFrame() {
-  for (int i = 0; i < NUM_LEDS; i++) {
-    float pos = fmodf(i + posOffset[i] + NUM_LEDS, (float)NUM_LEDS);
+  for (int s = 0; s < NUM_STRIPS; s++) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+      float pos = fmodf(i + posOffset[s][i] + NUM_LEDS, (float)NUM_LEDS);
 
-    float signedDist = pulsePos - pos;
-    if (signedDist > NUM_LEDS / 2.0) signedDist -= NUM_LEDS;
-    if (signedDist < -NUM_LEDS / 2.0) signedDist += NUM_LEDS;
+      float signedDist = pulsePos - pos;
+      if (signedDist > NUM_LEDS / 2.0) signedDist -= NUM_LEDS;
+      if (signedDist < -NUM_LEDS / 2.0) signedDist += NUM_LEDS;
 
-    float waveBrightness;
-    if (signedDist >= 0) {
-      waveBrightness = 1.0 - (signedDist / tailWidth);
-    } else {
-      waveBrightness = 1.0 - (-signedDist / leadWidth);
+      float waveBrightness;
+      if (signedDist >= 0) {
+        waveBrightness = 1.0 - (signedDist / tailWidth);
+      } else {
+        waveBrightness = 1.0 - (-signedDist / leadWidth);
+      }
+      if (waveBrightness < 0) waveBrightness = 0;
+      uint8_t level = pow(waveBrightness, GAMMA) * 255;
+
+      strips[s]->setPixelColor(i, strips[s]->Color(level, level, level));
     }
-    if (waveBrightness < 0) waveBrightness = 0;
-    uint8_t level = pow(waveBrightness, GAMMA) * 255;
-
-    strip.setPixelColor(i, strip.Color(level, level, level));
   }
-  strip.show();
 
+  // Pushed out back-to-back after all 3 are calculated — each show() takes
+  // ~1.2 ms, so the strips update within ~4 ms of each other.
+  for (int s = 0; s < NUM_STRIPS; s++) {
+    strips[s]->show();
+  }
+
+  // Advanced once per frame (not once per strip), keeping all 3 in step.
   pulsePos += pulseSpeed;
   if (pulsePos >= NUM_LEDS) pulsePos -= NUM_LEDS;
 }
@@ -269,14 +303,16 @@ void handleResponse(const String& response) {
 
   quakeFlashDurationMs = quakeFlashDurationForMagnitude(magnitudeStr.toFloat());
 
-  Serial.print("New earthquake detected! Flashing strip for ");
+  Serial.print("New earthquake detected! Flashing all strips for ");
   Serial.print(quakeFlashDurationMs / 1000.0);
   Serial.println("s.");
 
-  for (int i = 0; i < NUM_LEDS; i++) {
-    strip.setPixelColor(i, strip.Color(255, 255, 255));
+  for (int s = 0; s < NUM_STRIPS; s++) {
+    strips[s]->fill(strips[s]->Color(255, 255, 255));
   }
-  strip.show();
+  for (int s = 0; s < NUM_STRIPS; s++) {
+    strips[s]->show();
+  }
 
   quakeFlashActive = true;
   quakeFlashStartTime = millis();

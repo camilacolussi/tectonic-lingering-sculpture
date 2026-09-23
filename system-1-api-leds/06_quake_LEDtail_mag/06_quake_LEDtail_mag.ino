@@ -1,10 +1,17 @@
 /*
-  05_quake_LEDtail
+  06_quake_LEDtail_mag
 
-  Combines 01_led_test's LED wave-tail pattern with 04_new-quake's USGS
-  earthquake detection: the wave tail runs continuously, but when a new
-  earthquake is detected, the whole strip snaps to solid white for 5
-  seconds, then resumes the wave tail pattern from where it left off.
+  Builds on 05_quake_LEDtail (01_led_test's LED wave-tail pattern +
+  04_new-quake's USGS earthquake detection): the wave tail runs
+  continuously, but when a new earthquake is detected, the whole strip
+  snaps to solid white, then resumes the wave tail pattern from where it
+  left off.
+
+  New in 06: the white flash length scales with the quake's magnitude
+  instead of a fixed 5 seconds. MIN_MAGNITUDE (4.5) holds for 5 s, the top
+  of the scale (QUAKE_FLASH_DURATION_MAX_MAGNITUDE) holds for 3 minutes, and
+  anything in between is a straight-line interpolation — see
+  quakeFlashDurationForMagnitude().
 
   Checks USGS every minute over eduroam (WPA2-Enterprise) — see
   02_ESP32_eduroam for the connection method on its own.

@@ -189,16 +189,51 @@ earthquake's magnitude to Serial once a minute.
   ESP32 V2**, Tools → Upload Speed → **115200** (see the Blink upload fix
   logged above — same fix applies here).
 
+## Three strips (`07_quake_LEDtail_mag_x3_sync`)
+
+**Written 2026-09-23, compiles for the Feather ESP32 V2 — not yet tested on hardware.**
+Builds on `06_quake_LEDtail_mag`: same wave tail, quake detection and
+magnitude-scaled flash, but across 3 strips instead of 1.
+
+- **Own data pin per strip, not chained or split in hardware.** Chaining/splitting
+  one data line would guarantee identical strips with almost no code change,
+  but locks all 3 into the same length and look forever. Separate pins keep
+  each strip independently controllable. Timing cost is negligible: each
+  `show()` is ~1.2 ms for 40 LEDs, so all 3 update within ~4 ms of each other,
+  against a 40 ms frame.
+- **Pins: A5, A0, A1.** On the Feather ESP32 V2, A2/A3/A4 are input-only
+  (GPIO 34/39/36) and can't drive a strip. A0/A1 are ADC2 pins (ADC2 analog
+  reads don't work while WiFi is on), but that only affects `analogRead`, not
+  using them as digital outputs.
+- **`randomSeed` moved from A0 to A2**, since A0 is now a strip output — reading
+  it would give the same seed every boot, so the shimmer would repeat.
+- **Shared wave, separate shimmer.** One `pulsePos` for all strips, so the pulse
+  moves in step; a separate `posOffset` row per strip, so each has its own
+  texture.
+- **LED count: 40 per strip** (was 41 on the single-strip sketches).
+- **Power:** 3 x 40 LEDs at full white is roughly 4+ A at brightness 150, and the
+  flash can now hold for up to 3 minutes. An external supply rated for this is
+  needed. Which supply goes with which stage:
+  - **5V 3A** — used for sketches 01–06 (one strip, 41 LEDs). Enough there:
+    one strip at full white is ~1.4 A at brightness 150.
+  - **5V 30A** — used from 07 onwards (3 strips, 40 LEDs each). The 3A
+    supply is no longer enough (~4+ A worst case during the flash); 30A
+    leaves a very large margin. Because a 30A supply can push a lot of
+    current into a short circuit, a fuse on the 5V line and wire rated for
+    the current are worth adding.
+
 ## Open items
 
 - [x] Confirm the ESP32-S3 Feather development setup is working on the computer
-- [x] Confirm whether a separate 5V power supply is needed for the strip — yes, 5V 3A external supply, wired and confirmed (on the S3 stand-in)
+- [x] Confirm whether a separate 5V power supply is needed for the strip — yes, 5V 3A external supply, wired and confirmed (on the S3 stand-in) — replaced by a 5V 30A supply from 07 onwards (3 strips)
 - [x] Build and test the wave pulse pattern on one strip (`system-1-api-leds/01_led_test/`) — confirmed working on hardware
-- [x] Confirm final LED count — 41
-- [ ] Decide whether strips 2 and 3 will use their own data pins or be chained (strip 1 uses A5 on the S3 stand-in)
+- [x] Confirm final LED count — 40 per strip, 3 strips (was 41 on the single-strip sketches 01–06)
+- [x] Decide whether strips 2 and 3 will use their own data pins or be chained — own pins: A5, A0, A1 on the V2 (see Three strips section)
+- [ ] Test `07_quake_LEDtail_mag_x3_sync` on hardware with all 3 strips (40 LEDs each)
 - [x] Confirm exact ESP32 V2 board model — Adafruit Feather ESP32 V2 (chip: ESP32-PICO-V3-02), in hand and uploading successfully as of 2026-08-07
 - [ ] Confirm the V2 board's pinout once wiring the LED strip to it (data pin was A5/GPIO8 on the S3 stand-in — likely needs to change)
 - [ ] Re-verify power wiring, data pin, and protective components once moved from the S3 stand-in to the actual V2 board
 - [ ] Decide whether touch-pauses-LEDs is dropped, or revisited later via a wireless link between the two boards
 - [x] Build and test the USGS earthquake API fetch — confirmed working (`system-1-api-leds/03_API_test/`), prints magnitude to Serial once a minute over eduroam
-- [ ] Wire the fetched magnitude into the LED wave pulse pattern (currently the two sketches are separate — `01_led_test` for LEDs, `03_API_test` for the API — not yet combined into one program)
+- [x] Wire the fetched magnitude into the LED wave pulse pattern — combined in `05_quake_LEDtail` (new quake → white flash), then `06_quake_LEDtail_mag` made the flash duration scale with magnitude
+- [ ] Add the power supply enclosure (box being built for the 5V 30A supply) to the repo once finished — files/photos/notes, so all physical elements live here too
