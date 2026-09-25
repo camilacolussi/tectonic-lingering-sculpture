@@ -31,7 +31,7 @@ now that they're on separate boards.
 ## Structure
 
 ```
-docs/                     Project roadmap, per-system notes, and tutorial
+docs/                     Project roadmap, per-system notes, hardware design, and tutorial
 system-1-api-leds/        Code for the API + LEDs system
 system-2-sound-touch/     Code for the touch + sound system
 media/                    Photos/videos of the physical build

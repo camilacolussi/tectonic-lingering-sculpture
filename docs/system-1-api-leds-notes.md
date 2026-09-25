@@ -221,6 +221,9 @@ magnitude-scaled flash, but across 3 strips instead of 1.
     leaves a very large margin. Because a 30A supply can push a lot of
     current into a short circuit, a fuse on the 5V line and wire rated for
     the current are worth adding.
+- **Physical build (enclosure, connectors, strain relief):** see
+  [hardware-design.md](hardware-design.md). Strip power cables connect with
+  Wago lever connectors inside the box; each strip draws ~2.4 A max.
 
 ## Open items
 
@@ -236,4 +239,4 @@ magnitude-scaled flash, but across 3 strips instead of 1.
 - [ ] Decide whether touch-pauses-LEDs is dropped, or revisited later via a wireless link between the two boards
 - [x] Build and test the USGS earthquake API fetch — confirmed working (`system-1-api-leds/03_API_test/`), prints magnitude to Serial once a minute over eduroam
 - [x] Wire the fetched magnitude into the LED wave pulse pattern — combined in `05_quake_LEDtail` (new quake → white flash), then `06_quake_LEDtail_mag` made the flash duration scale with magnitude
-- [ ] Add the power supply enclosure (box being built for the 5V 30A supply) to the repo once finished — files/photos/notes, so all physical elements live here too
+- [ ] Power supply enclosure: tracked in [hardware-design.md](hardware-design.md) Open items

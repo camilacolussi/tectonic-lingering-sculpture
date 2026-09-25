@@ -17,6 +17,7 @@ now with more understanding of what I'm doing (previously had to ask for help).
   - **System 1 — API + LEDs**: code in `system-1-api-leds/`, notes in [docs/system-1-api-leds-notes.md](docs/system-1-api-leds-notes.md). Target board: ESP32 V2 (not yet owned as of 2026-08-06 — being tested on the ESP32-S3 as a stand-in until it arrives).
   - **System 2 — Touch + Sound**: code in `system-2-sound-touch/`, notes in [docs/system-2-sound-touch-notes.md](docs/system-2-sound-touch-notes.md). Board: Adafruit ESP32-S3 Feather.
 - Full plan, decisions made, and open questions: see [docs/roadmap.md](docs/roadmap.md)
+- Physical build (enclosures, power distribution, cabling, connectors): see [docs/hardware-design.md](docs/hardware-design.md). Log hardware/fabrication decisions there, not in the system notes.
 - Step-by-step build tutorial (for others to follow, written for a stranger with no context): see [docs/tutorial.md](docs/tutorial.md) — grows alongside the work. Different from the per-system notes: the notes capture *why* decisions were made, while the tutorial explains *how* to do each step. Update both when completing a real step, don't just update one.
 - Each system's notes file should end with an **Open items** checklist — check this before assuming what's done vs. still pending.
 - Edit the documents in the docs folder if we take different decisions or what they say needs update.
